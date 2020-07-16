@@ -11,29 +11,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <exception>
-#include <new>
-
-/**
- * @brief check malloc pass, throw std::bad_alloc
- * 
- * @param var pointer to be checked
- * @param str string to print prior to throwing error
- */
-inline void check_malloc(void *var, const char *str)
-{
-	if (var == NULL)
-	{
-		printf("%s", str);
-		throw std::bad_alloc();
-	}
-}
 
 inline bool check_name_len(const char *name)
 {
 	if (MAX_NAME_SIZE == strnlen(name, MAX_NAME_SIZE))
 	{
-		DEBUG("%s longer than max name len(%d)\n",name,MAX_NAME_SIZE);
+		DEBUG("%.*s... longer than max name len (%d)\n",
+              MAX_NAME_SIZE,name,MAX_NAME_SIZE);
 		return false;
 	}
 	return true;
