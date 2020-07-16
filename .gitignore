@@ -8,3 +8,6 @@
 
 # ignore any bin dir
 */bin/*
+
+# ignore any .vscode dir
+*.vscode*

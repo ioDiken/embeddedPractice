@@ -1,19 +1,23 @@
-# DataStructures Makefile
+# dataStructures Makefile
+# TODO:
+## g++ create output directory if DNE
+## change from literal string ./tests.* to variable 
 
+# libs
 LIBS = gtest
 LIBS += pthread # required for gtest
-
-CC = g++
-CFLAGS = -Wall -O2
-LDFLAGS = -L /usr/local/lib
-LDFLAGS += $(foreach name, $(LIBS), -l $(name))
 
 # includes
 INCV = ./inc
 INCV += /usr/local/include
-CFLAGS += $(foreach inc, $(INCV), -iquote $(inc))
 
-# libs
+CC = g++
+CFLAGS = -Wall -O2 -std=c++11 
+CFLAGS += $(foreach inc, $(INCV), -iquote $(inc))
+LDFLAGS = -L /usr/local/lib
+LDFLAGS += $(foreach name, $(LIBS), -l $(name))
+
+# libs pt2
 LIB_PATH = ./lib
 C_LIB_SRC = $(realpath $(wildcard $(LIB_PATH)/*.c)) # match *.c
 CPP_LIB_SRC = $(realpath $(wildcard $(LIB_PATH)/*.cpp)) # match *.cpp
@@ -22,9 +26,8 @@ CPP_LIB_SRC = $(realpath $(wildcard $(LIB_PATH)/*.cpp)) # match *.cpp
 SRC_PATH = ./src
 CPP_LIB_SRC += $(realpath $(wildcard $(SRC_PATH)/*.cpp)) # match *.cpp
 
-# add to objects
+# create list of objects
 OBJECTS = $(foreach obj,$(basename $(notdir $(C_LIB_SRC) $(CPP_LIB_SRC))), $(BUILD_PATH)/$(obj).o)
-# OBJECTS = $(foreach obj,$(basename $(notdir C_LIB_SRC)),$(BUILD_PATH)/$(obj))
 
 BUILD_PATH = ./build
 TARGET = ./bin/tests
@@ -32,19 +35,15 @@ TARGET = ./bin/tests
 .DEFAULT: all
 .PHONY: all clean $(OBJECTS) $(C_LIB_SRC) $(CPP_LIB_SRC)
 
-all: FUCK $(C_LIB_SRC) $(CPP_LIB_SRC)
+all: $(C_LIB_SRC) $(CPP_LIB_SRC)
 	# build main test object
 	$(CC) $(CFLAGS) -c ./tests.cpp
 
 	# build main test
 	$(CC) $(CFLAGS) -o $(TARGET) $(OBJECTS) ./tests.o $(LDFLAGS)
 
-FUCK:
-	@echo "C Sources" $(C_LIB_SRC)
-	@echo "CPP Sources" $(CPP_LIB_SRC)
-
 $(C_LIB_SRC):
-	$(CC) -c $(CFLAGS) $@ -o $(BUILD_PATH)/$(patsubst %.c,%.o,$(notdir $@))
+	$(CC) $(CFLAGS) -c $@ -o $(BUILD_PATH)/$(patsubst %.c,%.o,$(notdir $@))
 
 $(CPP_LIB_SRC):
-	$(CC) -c $(CFLAGS) $@ -o $(BUILD_PATH)/$(patsubst %.cpp,%.o,$(notdir $@))
+	$(CC) $(CFLAGS) -c $@ -o $(BUILD_PATH)/$(patsubst %.cpp,%.o,$(notdir $@))
