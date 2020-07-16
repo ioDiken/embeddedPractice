@@ -1,0 +1,10 @@
+# ignore file for embeddedPractice
+
+# ignore all object files
+*.o
+
+# ignore all static libs
+*.a
+
+# ignore any bin dir
+*/bin/*
