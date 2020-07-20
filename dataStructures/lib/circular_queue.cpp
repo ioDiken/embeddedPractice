@@ -46,11 +46,12 @@ bool circularQueue::enq(const char *msg, uint8_t val)
     if (!check_msg_len(msg))
         return false;
     
-    // check & update vars for enq
-    if (enq_check())
+    if (!isFull())
     {
         strncpy(q[tail].msg, msg, MAX_MSG_SIZE);
         q[tail].val = val;
+
+        // update vars depending on implementation
         enq_inc();
         return true;
     }
@@ -62,11 +63,21 @@ q_entry circularQueue::deq()
 {
 	DEBUG("\nBeginning %s\n", __func__);
 
-    // check & update vars for deq
-    if (deq_check())
+    if (!isEmpty())
     {
         q_entry ret = q[head];
-        deq_inc();
+
+        CIRCULAR_INC(head,q_sz);
+
+        // if head+1 == tail, then reset vars
+        // aka final item
+        if (head == tail)
+        {
+            DEBUG("Resetting Queue\n");
+            head = -1; // empty condition
+            tail = 0;
+        }
+
         return ret;
     }
 
@@ -97,7 +108,7 @@ bool circularQueue::isEmpty()
     return false;
 }
 
-bool circularQueue::enq_check()
+void circularQueue::enq_inc()
 {
 	DEBUG("\nBeginning %s\n", __func__);
 
@@ -106,46 +117,10 @@ bool circularQueue::enq_check()
     {
         DEBUG("First Entry in Queue\n");
         head++;
-        return true;
     }
-    
-    if (isFull())
-        return false;
-
-    return true;
-}
-
-void circularQueue::enq_inc()
-{
-	DEBUG("\nBeginning %s\n", __func__);
 
     CIRCULAR_INC(tail,q_sz);
-}
-
-bool circularQueue::deq_check()
-{
-	DEBUG("\nBeginning %s\n", __func__);
-
-    if (isEmpty())
-        return false;
-
-    return true;
-}
-
-void circularQueue::deq_inc()
-{
-	DEBUG("\nBeginning %s\n", __func__);
-
-    CIRCULAR_INC(head,q_sz);
-
-    // if head+1 == tail, then reset vars
-    // aka final item
-    if (head == tail)
-    {
-        DEBUG("Resetting Queue\n");
-        head = -1;
-        tail = 0;
-    }
+    
 }
 
 void circularQueue::print_queue()
@@ -165,5 +140,21 @@ void circularQueue::print_queue()
     }
 }
 
+void circularQueue_wrap::enq_inc()
+{
+    // if first entry
+    if (isEmpty())
+    {
+        DEBUG("First Entry in Queue\n");
+        head++;
+    }
+    // increment head w/ tail if wrapping has begun
+    else if (tail == head)
+    {
+        head++;
+    }
+
+    CIRCULAR_INC(tail,q_sz);
+}
 
 #endif /* DA814913_C727_4C93_8B7E_D384DB48D78A */

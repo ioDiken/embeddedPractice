@@ -22,17 +22,20 @@ protected:
     q_entry ret_entry;
     int q_size;
     circularQueue *q;
+    circularQueue *qw;
 
     virtual void SetUp()
     {
         q_size = 8;
 
         q = new circularQueue(q_size);
+        qw = new circularQueue_wrap(q_size);
     }
 
     virtual void TearDown()
     {
         delete q;
+        delete qw;
     }
 };
 
@@ -53,10 +56,13 @@ protected:
 ** queue to full + 1
 ** after dequeue 1
 ** queue to full (should only be 1)
-** (W) enq past wrap
 * deq
 ** queue 1 & dequeue to fail
 ** queue full & dequeue to fail
+* wrapping
+** queue to full & wrap
+** empty queue and compare vals to ensure entries match order
+** empty to empty
 */
 
 TEST_F(Queue_T, empty)
@@ -177,4 +183,46 @@ TEST_F(Queue_T, dequeue)
     // no fail when deq from empty queue
     ret_entry = q->deq();
     EXPECT_TRUE(ret_entry == FAILED_DEQ) << "NF when dequeue from empty queue" << std::endl;
+}
+
+TEST_F(Queue_T, wrapping)
+{
+    // queue to full & more
+    std::string s(MAX_MSG_SIZE-1, 'a');
+    q_entry q_s_entry;
+    strcpy(q_s_entry.msg,s.c_str());
+    q_s_entry.val = 0;
+    for (int i = 0; i < q_size; i++)
+    {
+        status = qw->enq(q_s_entry.msg,q_s_entry.val);
+        EXPECT_TRUE(status) << "F when adding to queue" << std::endl;
+    }
+
+    // add 2 more to queue to ensure wrapping
+    std::string s1(MAX_MSG_SIZE-2, 'a');
+    q_entry q_s1_entry;
+    strcpy(q_s1_entry.msg,s1.c_str());
+    q_s1_entry.val = 0;
+    for (int i = 0; i < 2; i++)
+    {
+        status = qw->enq(q_s1_entry.msg,q_s1_entry.val);
+        EXPECT_TRUE(status) << "F when adding to queue after wrapping" << std::endl;
+    }
+
+    // check entries prior to wrap
+    for (int i = 2; i < q_size; i++)
+    {
+        ret_entry = qw->deq();
+        EXPECT_TRUE(ret_entry == q_s_entry) << "F when deq and comparing initial non-wrapped entries" << std::endl; 
+    }
+
+    // check entries post wrap
+    for (int i = 0; i < 2; i++)
+    {
+        ret_entry = qw->deq();
+        EXPECT_TRUE(ret_entry == q_s1_entry) << "F when deq and comparing wrapped entries" << std::endl; 
+    }
+
+    status = qw->isEmpty();
+    EXPECT_TRUE(status) << "NF when checking if wrapped queue is empty" << std::endl;
 }

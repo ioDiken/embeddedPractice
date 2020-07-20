@@ -62,22 +62,17 @@ protected:
     int head, tail;
     uint16_t q_sz;
 
-    virtual bool enq_check(); // checks & updates front
     virtual void enq_inc(); // post enq increment
-    virtual bool deq_check(); // checks & updates rear
-    virtual void deq_inc(); // post deq increment
 };
 
 class circularQueue_wrap : public circularQueue
 {
 public:
-    circularQueue_wrap(uint16_t size);
-    ~circularQueue_wrap();
+    circularQueue_wrap(uint16_t size) : circularQueue(size) {}
+    ~circularQueue_wrap() = default;
     virtual bool isFull() override {return false;} // always false
 protected:
-    virtual bool enq_check() override; // checks & updates front/rear
-    virtual bool deq_check() override; // checks & updates front/rear
-    virtual void print_queue();
+    virtual void enq_inc() override; // post enq increment
 };
 
 
