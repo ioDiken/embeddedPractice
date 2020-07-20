@@ -19,6 +19,21 @@
 #define DEBUG(...)
 #endif
 
+/**
+ * @brief check malloc pass, throw std::bad_alloc
+ * 
+ * @param var pointer to be checked
+ * @param str string to print prior to throwing error
+ */
+inline void check_malloc(void *var, const char *str)
+{
+	if (var == NULL)
+	{
+		printf("%s", str);
+		throw std::bad_alloc();
+	}
+}
+
 // redirect cout guard class to ensure buffer is reset
 struct cout_redirect {
     cout_redirect( std::streambuf * new_buffer ) 
