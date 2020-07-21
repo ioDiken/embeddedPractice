@@ -7,43 +7,53 @@
 LIBS = gtest
 LIBS += pthread # required for gtest
 
+# avoid any issues w/ shell inheritance
+SHELL = /bin/sh
+
 # includes
 INCV = ./inc
 INCV += /usr/local/include
 
 CC = g++
-CFLAGS = -Wall -O2 -std=c++11 
+CFLAGS = -Wall -O2 -std=c++11 -g
 CFLAGS += $(foreach inc, $(INCV), -iquote $(inc))
 LDFLAGS = -L /usr/local/lib
 LDFLAGS += $(foreach name, $(LIBS), -l $(name))
 
-# libs pt2
+# libs
 LIB_PATH = ./lib
-C_LIB_SRC = $(realpath $(wildcard $(LIB_PATH)/*.c)) # match *.c
 CPP_LIB_SRC = $(realpath $(wildcard $(LIB_PATH)/*.cpp)) # match *.cpp
 
-# gtests
+# gtest fixtures
 SRC_PATH = ./src
 CPP_LIB_SRC += $(realpath $(wildcard $(SRC_PATH)/*.cpp)) # match *.cpp
 
-# create list of objects
-OBJECTS = $(foreach obj,$(basename $(notdir $(C_LIB_SRC) $(CPP_LIB_SRC))), $(BUILD_PATH)/$(obj).o)
-
 BUILD_PATH = ./build
 TARGET = ./bin/tests
+GTEST_MAIN = ./tests.cpp
 
-.DEFAULT: all
-.PHONY: all clean $(OBJECTS) $(C_LIB_SRC) $(CPP_LIB_SRC)
+# create list of objects
+OBJECTS = $(foreach obj,$(basename $(notdir $(CPP_LIB_SRC))), $(BUILD_PATH)/$(obj).o)
 
-all: $(C_LIB_SRC) $(CPP_LIB_SRC)
+# dirs to be created & also cleaned
+CREATE_DIRS = $(dir $(TARGET))
+CREATE_DIRS += $(BUILD_PATH)
+
+.PHONY: clean $(TARGET) $(CREATE_DIRS) $(OBJECTS) $(CPP_LIB_SRC)
+
+$(TARGET): $(CREATE_DIRS) $(CPP_LIB_SRC)
 	# build main test object
-	$(CC) $(CFLAGS) -c ./tests.cpp
+	$(CC) $(CFLAGS) -c $(GTEST_MAIN) -o $(BUILD_PATH)/$(patsubst %.cpp,%.o,$(notdir $(GTEST_MAIN)))
 
 	# build main test
-	$(CC) $(CFLAGS) -o $(TARGET) $(OBJECTS) ./tests.o $(LDFLAGS)
+	$(CC) $(CFLAGS) -o $@ $(OBJECTS) tests.o $(LDFLAGS)
 
-$(C_LIB_SRC):
-	$(CC) $(CFLAGS) -c $@ -o $(BUILD_PATH)/$(patsubst %.c,%.o,$(notdir $@))
+# create dirs
+$(CREATE_DIRS):
+	mkdir -p $@
 
 $(CPP_LIB_SRC):
 	$(CC) $(CFLAGS) -c $@ -o $(BUILD_PATH)/$(patsubst %.cpp,%.o,$(notdir $@))
+
+clean:
+	rm -r $(CREATE_DIRS)

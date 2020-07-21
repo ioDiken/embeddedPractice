@@ -9,8 +9,11 @@
 # ignore any bin dir
 */bin/*
 
+# ignore build dirs
+*/build/*
+
 # ignore any .vscode dir
 *.vscode*
 
 # ignore .DS_STORE
-.DS_STORE
+*.DS_STORE

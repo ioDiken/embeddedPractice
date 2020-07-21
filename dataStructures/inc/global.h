@@ -27,27 +27,28 @@
  */
 inline void check_malloc(void *var, const char *str)
 {
-	if (var == NULL)
-	{
-		printf("%s", str);
-		throw std::bad_alloc();
-	}
+    if (var == NULL)
+    {
+        printf("%s", str);
+        throw std::bad_alloc();
+    }
 }
 
 // redirect cout guard class to ensure buffer is reset
-struct cout_redirect {
-    cout_redirect( std::streambuf * new_buffer ) 
-        : old( std::cout.rdbuf( new_buffer ) )
-    { }
+struct cout_redirect
+{
+    cout_redirect(std::streambuf *new_buffer)
+        : old(std::cout.rdbuf(new_buffer))
+    {
+    }
 
-    ~cout_redirect( ) {
-        std::cout.rdbuf( old );
+    ~cout_redirect()
+    {
+        std::cout.rdbuf(old);
     }
 
 private:
-    std::streambuf * old;
+    std::streambuf *old;
 };
-
-
 
 #endif /* A0A9ECC1_3A79_4D60_99E2_5C2C22D6C056 */
