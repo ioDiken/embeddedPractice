@@ -12,13 +12,13 @@
 #include <utility> // std::pair
 
 #include "global.h"
-#include "chained_hashtable.h"
+#include "chained_hashtable.hpp"
 
 class Chained_Hash : public ::testing::Test
 {
 protected:
     bool status;
-    chainedHash *chain;
+    chainedHash_person *chain;
 
     std::vector<std::pair<std::string,uint8_t>> people = {
         {"Jimmy", 8},
@@ -40,7 +40,7 @@ protected:
 
     virtual void SetUp()
     {
-        chain = new chainedHash(people.size()/2 - 1); // guarantees atleast 1 chain of 3
+        chain = new chainedHash_person(people.size()/2 - 1); // guarantees atleast 1 chain of 3
     }
 
     virtual void TearDown()
