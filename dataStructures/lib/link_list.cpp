@@ -10,7 +10,7 @@
 
 #include "linked_list.h"
 
-bool LinkedList::push(uint8_t val)
+bool LinkedList::push(uint16_t val)
 {
 	DEBUG("\nBeginning %s\n", __func__);
 
@@ -145,7 +145,7 @@ int LinkedList::remove_element(int i)
     return -1;
 }
 
-bool LinkedList::remove_vals(uint8_t val)
+bool LinkedList::remove_vals(uint16_t val)
 {
 	DEBUG("\nBeginning %s\n", __func__);
 

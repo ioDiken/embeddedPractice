@@ -9,14 +9,8 @@
 #define C2DB7E3C_8530_438A_9788_5E59831718DA
 
 #include <stdint.h>
-
-#define MAX_NAME_SIZE 20
-
-typedef struct person {
-	char name[MAX_NAME_SIZE];
-	uint8_t age;
-	struct person *next;
-} person;
+#include <stdlib.h>
+#include "global.h"
 
 // Partially abstract class for chained hash tables
 template<typename hash_entry, typename key_t>
@@ -154,6 +148,14 @@ private:
 
 };
 
+#define MAX_NAME_SIZE 20
+
+typedef struct person {
+	char name[MAX_NAME_SIZE];
+	uint8_t age;
+	struct person *next;
+} person;
+
 class chainedHash_person : public chainedHash_Base<person,const char*>
 {
 public:
@@ -161,25 +163,25 @@ public:
 	~chainedHash_person() = default;
 
 	virtual bool put(person entry) {} // required to "implement virtual function"
-	virtual bool put(const char *key, uint8_t age) // overload function
+	virtual bool put(const char *name, uint8_t age) // overload function
 	{
 		DEBUG("\nBeginning %s\n", __func__);
 
-		if (!check_key_valid(key))
+		if (!check_key_valid(name))
 			return false;
 
-		uint16_t code = hash_function(key);
+		uint16_t code = hash_function(name);
 
 		// create new person
-		person *new_p = (person *) malloc(sizeof(person));
-		check_malloc((void *) new_p, "Cannot create new person, malloc failed\n");
-		memset(new_p, 0, sizeof(person));
-		strcpy(new_p->name,key);
-		new_p->age = age;
+		person *new_e = (person *) malloc(sizeof(person));
+		check_malloc((void *) new_e, "Cannot create new person, malloc failed\n");
+		memset(new_e, 0, sizeof(person));
+		strcpy(new_e->name,name);
+		new_e->age = age;
 
 		// if code entry is emtpy
 		if (hash_table[code] == NULL) {
-			hash_table[code] = new_p;
+			hash_table[code] = new_e;
 			DEBUG("%s | %d\n",hash_table[code]->name, hash_table[code]->age);
 		} else {
 			// iterate to end of list
@@ -189,7 +191,7 @@ public:
 			}
 
 			DEBUG("%s | %d\n",current->name, current->age);
-			current->next = new_p;
+			current->next = new_e;
 		}
 
 		return true;

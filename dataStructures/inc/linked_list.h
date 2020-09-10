@@ -12,7 +12,7 @@
 #include <stdint.h>
 
 typedef struct node_t {
-    uint8_t val;
+    uint16_t val;
     struct node_t *next;
 } node_t;
 
@@ -22,7 +22,7 @@ public:
     LinkedList() { head = NULL; }
     ~LinkedList() { free_lst(); }
 
-    bool push(uint8_t val); // ret P/F
+    bool push(uint16_t val); // ret P/F
     int pop(); // ret -1 if DNE else val
 
     int get_len();
@@ -31,7 +31,7 @@ public:
     void reverse_lst();
     int get_element(int i); // ret -1 if DNE else val
     int remove_element(int i); // ret -1 if DNE else val
-    bool remove_vals(uint8_t val); // remove vals that match
+    bool remove_vals(uint16_t val); // remove vals that match
 
     void print_list();
 
